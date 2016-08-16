@@ -1,0 +1,12 @@
+cap = pcread('data3.ply');
+%figure
+%showPointCloud(cap);
+
+sdev = 1;
+decaped = pcdenoise(cap,'Threshold',sdev);
+pcwrite(decaped,'teapotOut','PLYFormat','binary');
+figure
+showPointCloud(decaped);
+title('Original Point Cloud')
+
+
