@@ -1,10 +1,10 @@
-%% 
-clear;
+%%read pointcloud and gclear;
 strPath = 'data';
 strName = 'data14_transformed.ply';
 strFull = fullfile(strPath,strName);
 
 ptCloud = pcread(strFull); %this is Cloud
+enerate models%%
 
 maxDistance = .9;
 maxAngularDistance = 5;
@@ -23,21 +23,9 @@ rem3 = select(rem2,outlierIndices); %select Cloud - Bottom - top
 
 [model3,inlierIndices,outlierIndices] = pcfitplane(rem3,maxDistance);
 ramp = select(rem3,inlierIndices); % select ramp pc
-%rem4 = select(rem3,outlierIndices); %select Cloud - bottom - Top - ramp = garbage
-% 
-% ramp.Normal = pcnormals(ramp); %find all normals to ramp
-% slopenor = mean(ramp.Normal); %find the mean normal vector
-% 
-% sdevtwo = .5;
-% rampnew = pcdenoise(ramp,'Threshold',sdevtwo,'NumNeighbors',50);
-% 
-% [model4,inlierIndices,outlierIndices] = pcfitplane(rampnew,maxDistance,slopenor,maxAngularDistance);
-% superramp = select(rampnew,inlierIndices); % select new superramp pc based on refiend normal 
-% %rem4 = select(rem3,outlierIndices); %select remaining garbage
-
 
 [point,line] = plane_intersect(model1,model3);
-deirection = cross(model1.Normal, line);
+direction = cross(model1.Normal, line);
 
 
 syms t;
@@ -95,23 +83,26 @@ for indone = 1:star
     end
 end
 
-midpoint = [0.5*(wrapped(eye,1)+wrapped(jay,1)) 0.5*(wrapped(eye,2)+wrapped(jay,2)) 0.5*(wrapped(eye,3)+wrapped(jay,3))];
+mid = [0.5*(wrapped(eye,1)+wrapped(jay,1)) 0.5*(wrapped(eye,2)+wrapped(jay,2)) 0.5*(wrapped(eye,3)+wrapped(jay,3))];
 
 objectz = planedistance(model1,model2);
 
 
+b_3 = 20;
+brick_length = (b_3*3); 
+printcenter = [-3.264 3.879];
+%syms tt;
+%linetocenter= [(direction(1)*tt + midpoint(1)) (direction(2)*tt + midpoint(2))];
 
-printcenter = [-1.897   -4.36];
-centerofprev = [midpoint(1)+29.25   midpoint(2)];
-centerofnew = centerofprev - printcenter;
+centerofprev = [(mid(1)+(0.5*brick_length*direction(1)))   (mid(2)+(0.5*brick_length*direction(2)))];
+centerofprev = centerofprev + printcenter;
+centerofnew = centerofprev - [((2/3)*brick_length*direction(1)) ((2/3)*brick_length*direction(2))];
 xaxis = [1  0   0];
 angleofrotation = atan2(norm(cross(line,xaxis)), dot(line,xaxis));% find the angle of rotation
-
+angleofrotation = rad2deg (angleofrotation);
 
 disp (centerofnew);
 disp (angleofrotation);
-
-
 
 close all;
 %%%%%%%%draw stuff###
@@ -248,9 +239,9 @@ pcshow(bottom)
 %mod = plot(model3, 'color', 'magenta');
 fp = fplot3(xt,yt,zt,[-50,50],'yX:');
 scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
-scatter3(midpoint(1),midpoint(2),midpoint(3),'go');
+scatter3(mid(1),mid(2),mid(3),'go');
 c= quiver3 (0,0,0,model1.Normal(1),model1.Normal(2),model1.Normal(3),'b'); %model 1
-q= quiver3 (0,0,0,deirection(1),deirection(2),deirection(3),'k'); %cross of normal to model 1 and line
+q= quiver3 (0,0,0,direction(1),direction(2),direction(3),'k'); %cross of normal to model 1 and line
 h= quiver3 (0,0,0,line(1),line(2),line(3),'g'); % line vector
 % plot3 (0,0,0)
   

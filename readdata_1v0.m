@@ -1,7 +1,7 @@
 close all
 clear
 strPath = 'data';
-strName = '44_HDR.ply';
+strName = '47_HDR.ply';
 strFull = fullfile(strPath,strName);
 cap = pcread(strFull);
 
@@ -68,7 +68,7 @@ ptCloudTformed = pctransform(ptCloudTformed,rottranf);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 strPath = 'data';
-strName = 'data14_transformed';
+strName = 'data17_transformed';
 strFull = fullfile(strPath,strName);
 
 %pcwrite(decaped,'data6_denoised','PLYFormat','binary');
