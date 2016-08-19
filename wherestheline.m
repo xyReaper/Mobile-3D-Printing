@@ -1,3 +1,4 @@
+%version 1.0
 function [wrapped] = wherestheline(t,xt,yt,zt,x,y,z)
 
 tic;
@@ -19,6 +20,7 @@ segc = zeros(m,n);
 
 
 situationx = 1;
+%version 1.0
 situationy = 1;
 situationz = 1;
 

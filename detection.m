@@ -1,7 +1,8 @@
-clear;
+%version 1.2
+function [center,angle] = detection(strName)
+
 strPath = 'data';
-strName = 'data17_transformed.ply';
-strFull = fullfile(data,strName);
+strFull = fullfile(strPath,strName);
 
 ptCloud = pcread(strFull); %this is Cloud
 
@@ -118,7 +119,7 @@ end
 
 mid = [0.5*(wrapped(eye,1)+wrapped(jay,1)) 0.5*(wrapped(eye,2)+wrapped(jay,2)) 0.5*(wrapped(eye,3)+wrapped(jay,3))];
 
-objectz = planedistance(model1,model2);% height between two planes
+% objectz = planedistance(model1,model2);% height between two planes
 %%%%%%%%%%%%%%%%%%%
 
 b_3 = 20;
@@ -137,10 +138,13 @@ angleofrotation = atan2(norm(cross(line,xaxis)), dot(line,xaxis));% find the ang
 angleofrotation = angleofrotation - pi/2;
 centerofnew = centerofnew - printcenter;
 
-disp (centerofnew);
-disp (angleofrotation);
-angleofrotation = rad2deg (angleofrotation);
-disp (angleofrotation);
+center = centerofnew;
+angle = angleofrotation;
+
+% disp (centerofnew);
+% disp (angleofrotation);
+% angleofrotation = rad2deg (angleofrotation);
+% disp (angleofrotation);
 
 %sanity check
 oldtonew = sqrt((centerofnew(1)-centerofprev(1))^2+(centerofnew(2)-centerofprev(2))^2);

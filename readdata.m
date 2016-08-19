@@ -1,5 +1,7 @@
+%%% Version 1.1
+
 close all
-clear
+
 strPath = 'data';
 strName = '48_HDR.ply';
 strFull = fullfile(strPath,strName);
