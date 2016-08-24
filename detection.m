@@ -10,55 +10,55 @@ maxDistance = .9;
 maxAngularDistance = 5;
 sdevone = 1;
 
-[model1,inlierIndices,outlierIndices] = pcfitplane(ptCloud,maxDistance);
+[TopModel,inlierIndices,outlierIndices] = pcfitplane(ptCloud,maxDistance);
 bottom = select(ptCloud,inlierIndices); %select BOTTOM ground pc
 rem1 = select(ptCloud,outlierIndices); %select Cloud - bottom pc
 
 rem2 = pcdenoise(rem1,'Threshold',sdevone); %denoising 
-clear rem1;
+clear rem1; 
 
 %no platform
-[model2,inlierIndices,outlierIndices] = pcfitplane(rem2,maxDistance);
+[BottomModel,inlierIndices,outlierIndices] = pcfitplane(rem2,maxDistance);
 top = select(rem2,inlierIndices);% select TOP ground pc
 rem3 = select(rem2,outlierIndices); %select Cloud - Bottom - top
 clear rem2;
 
-[model3,inlierIndices,outlierIndices] = pcfitplane(rem3,maxDistance);
+[RampModel,inlierIndices,outlierIndices] = pcfitplane(rem3,maxDistance);
 ramp = select(rem3,inlierIndices); % select ramp pc
 clear rem3;
 %%early checks and sets
 
-%%this will make sure the model1/bottom is pointing vertically up
-if (model1.Normal(3)<=0.9)
-    if (model1.Normal(3)<=-0.9)
-        holdpar = -1.*(model1.Parameters);
-        model1 = planeModel(holdpar);
+%%this will make sure the BottomModel/bottom is pointing vertically up
+if (TopModel.Normal(3)<=0.9)
+    if (TopModel.Normal(3)<=-0.9)
+        holdpar = -1.*(TopModel.Parameters);
+        TopModel = planeModel(holdpar);
         clear holdpar
      end
 end
 
-%%this will make sure the model2/top is pointing vertically up
-if (model2.Normal(3)<=0.9)
-    if (model2.Normal(3)<=-0.9)
-        holdpar = -1.*(model2.Parameters);
-        model2 = planeModel(holdpar);
+%%this will make sure the TopModel/top is pointing vertically up
+if (BottomModel.Normal(3)<=0.9)
+    if (BottomModel.Normal(3)<=-0.9)
+        holdpar = -1.*(BottomModel.Parameters);
+        BottomModel = planeModel(holdpar);
         clear holdpar
      end
 end
 
-%%this will make sure the model3/ramp is pointing away from 3D camera
-if (model3.Normal(1)<0)
-    if (model3.Normal(2)>0)
-        if (model3.Normal(1)<0)
-        holdpar = -1.*(model3.Parameters);
-        model3 = planeModel(holdpar);
+%%this will make sure the RampModel/ramp is pointing away from 3D camera
+if (RampModel.Normal(1)<0)
+    if (RampModel.Normal(2)>0)
+        if (RampModel.Normal(1)<0)
+        holdpar = -1.*(RampModel.Parameters);
+        RampModel = planeModel(holdpar);
         clear holdpar
         end
      end
 end
 
-[point,line] = plane_intersect(model1,model3);
-direction = cross(model1.Normal, line);
+[point,line] = plane_intersect(TopModel,RampModel);
+direction = cross(TopModel.Normal, line);
 
 
 syms t;
@@ -94,7 +94,7 @@ z = double(z);
 %%%%%%%%%%%%%%%%%
 %% PARFOR
 
-[wrapped] = wherestheline(t,xt,yt,zt,x,y,z);
+[wrapped] = wheres_the_line(t,xt,yt,zt,x,y,z);
 %% 
 
 % out = squareform(pdist(wrapped));
@@ -119,7 +119,7 @@ end
 
 mid = [0.5*(wrapped(eye,1)+wrapped(jay,1)) 0.5*(wrapped(eye,2)+wrapped(jay,2)) 0.5*(wrapped(eye,3)+wrapped(jay,3))];
 
-% objectz = planedistance(model1,model2);% height between two planes
+% objectz = planedistance(BottomModel,TopModel);% height between two planes
 %%%%%%%%%%%%%%%%%%%
 
 b_3 = 20;
@@ -170,10 +170,12 @@ ylabel('Y(m)')
 zlabel('Z(m)')
 
 pcshow(bottom)
-%mad = plot(model1, 'color', 'blue');
-%mod = plot(model3, 'color', 'magenta');
-
-c= quiver3 (0,0,0,model1.Normal(1),model1.Normal(2),model1.Normal(3),'b'); %model 1
+pcshow(top)
+mad = plot(RampModel, 'color', 'blue');
+mod = plot(TopModel, 'color', 'magenta');
+mod.FaceAlpha = 0.3;
+mad.FaceAlpha = 0.3;
+c= quiver3 (0,0,0,TopModel.Normal(1),TopModel.Normal(2),TopModel.Normal(3),'b'); %model 1
 c.AutoScaleFactor = 10;
 c.LineWidth = 5;
 c.MaxHeadSize = 5;
@@ -190,7 +192,7 @@ h.MaxHeadSize = 5;
 
 % plot3 (0,0,0)
 fp = fplot3(xt,yt,zt,[-150,50],'gX:');
-scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
+% scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
 scatter3(mid(1),mid(2),mid(3),'go');
 
 
@@ -207,8 +209,8 @@ figure
 pcshow(ramp)
 title('two planes and line intersect')%
 hold on
-%mad = plot(model1, 'color', 'blue');
-%mod = plot(model3, 'color', 'magenta');
+%mad = plot(BottomModel, 'color', 'blue');
+%mod = plot(RampModel, 'color', 'magenta');
 fp = fplot3(xt,yt,zt,[-50,50],'gX:');
 scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
 scatter3(mid(1),mid(2),mid(3),'go');
@@ -216,7 +218,7 @@ scatter3(centerofprev(1),centerofprev(2),0,'kX');
 scatter3(centerofnew(1),centerofnew(2),0,'rX');
 scatter3(printcenter(1),printcenter(2),0,'rO')
 
-c= quiver3 (0,0,0,model1.Normal(1),model1.Normal(2),model1.Normal(3),'b'); %model 1
+c= quiver3 (0,0,0,TopModel.Normal(1),TopModel.Normal(2),TopModel.Normal(3),'b'); %model 1
 q= quiver3 (0,0,0,direction(1),direction(2),direction(3),'k'); %cross of normal to model 1 and line
 h= quiver3 (0,0,0,line(1),line(2),line(3),'g'); % line vector
 % plot3 (0,0,0)
@@ -261,8 +263,8 @@ hold off
 % pcshow(bottom)
 % title('PLatform')
 % hold on
-% plot(model1)
-% plot(model3)
+% plot(BottomModel)
+% plot(RampModel)
 % ax = gca;
 % ax.Color = 'yellow';
 % hold off
@@ -281,7 +283,7 @@ hold off
 % hold on
 % ax = gca;
 % ax.Color = 'yellow';
-% plot(model2)
+% plot(TopModel)
 % hold off
 % 
 % 
@@ -291,7 +293,7 @@ hold off
 % hold on
 % ax = gca;
 % ax.Color = 'yellow';
-% plot(model3)
+% plot(RampModel)
 % hold off
 % 
 % 
@@ -326,7 +328,7 @@ hold off
 % title('two planes and line intersect')%
 % hold on
 % pcshow(top)
-% plot(model2, 'color', 'blue')
+% plot(TopModel, 'color', 'blue')
 % plot(model4, 'color', 'magenta')
 % fp = fplot3(xt,yt,zt,[-50,50],'r--o');
 % ax = gca;
@@ -337,21 +339,21 @@ hold off
 % hold off
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figure
-% pcshow(top)
-% title('two planes and line intersect')%
-% hold on
-% pcshow(ramp)
-% mad = plot(model2, 'color', 'blue');
-% mod = plot(model3, 'color', 'magenta');
-% fp = fplot3(xt,yt,zt,[-50,50],'r:');
-% % scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
-% zlabel('Z(m)')
-% 
-% axis auto
-% hold off
-% alpha(mad,.2)
-% alpha(mod,.2)
+figure
+pcshow(top)
+title('two planes and line intersect')%
+hold on
+pcshow(ramp)
+mad = plot(TopModel, 'color', 'blue');
+mod = plot(RampModel, 'color', 'magenta');
+fp = fplot3(xt,yt,zt,[-50,50],'r:');
+% scatter3(wrapped(:,1),wrapped(:,2),wrapped(:,3),'b*');
+zlabel('Z(m)')
+
+axis auto
+hold off
+alpha(mad,.2)
+alpha(mod,.2)
 
 
 

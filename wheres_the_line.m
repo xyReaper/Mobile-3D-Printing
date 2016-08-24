@@ -1,5 +1,5 @@
 %version 1.0
-function [wrapped] = wherestheline(t,xt,yt,zt,x,y,z)
+function [wrapped] = wheres_the_line(t,xt,yt,zt,x,y,z)
 
 tic;
 
@@ -78,8 +78,8 @@ switch situation
             testx = solve(xt == x(i),t,'real',true);
             testy = solve(yt == y(i),t,'real',true);
             testz = solve(zt == z(i),t,'real',true);
-            if aretheyequal(testx,testy) == 1
-                if aretheyequal(testy,testz) == 1
+            if are_they_equal(testx,testy) == 1
+                if are_they_equal(testy,testz) == 1
                     sega(i) = x(i);
                     segb(i) = y(i);
                     segc(i) = z(i);
@@ -93,7 +93,7 @@ switch situation
             if x(i) == 0
                 testy = solve(yt == y(i),t,'real',true);
                 testz = solve(zt == z(i),t,'real',true);
-                if aretheyequal(testy,testz) == 1
+                if are_they_equal(testy,testz) == 1
                         sega(i) = 0;
                         segb(i) = y(i);
                         segc(i) = z(i);
@@ -108,7 +108,7 @@ switch situation
             if y(i) == 0
                 testx = solve(xt == x(i),t,'real',true);
                 testz = solve(zt == z(i),t,'real',true);
-                if aretheyequal(testx,testz) == 1
+                if are_they_equal(testx,testz) == 1
                         sega(i) = x(i);
                         segb(i) = 0;
                         segc(i) = z(i);
@@ -123,7 +123,7 @@ switch situation
             if z(i) == 0
                 testx = solve(xt == x(i),t,'real',true);
                 testy = solve(yt == y(i),t,'real',true);
-                if aretheyequal(testx,testy) == 1
+                if are_they_equal(testx,testy) == 1
                         sega(i) = x(i);
                         segb(i) = y(i);
                         segc(i) = 0;

@@ -1,4 +1,10 @@
+% This function is based on 
+% plane intersection
+% by Nassim Khaled
+%  
+
 function [P,N]=plane_intersect(N1,N2)
+
 
 %get two points A1 and A2 on these two planes
 A1 = [0 0 0];

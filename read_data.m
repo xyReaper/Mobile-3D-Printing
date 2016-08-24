@@ -79,14 +79,14 @@ pcwrite(ptCloudTformed,strFull,'PLYFormat','binary');
 
 close all;
 % 
-% figure;
-% pcshow(downsampled);
-% title('After downsampling')
-% xlabel('X(m)')
-% ylabel('Y(m)')
-% zlabel('Z(m)')
-% ax = gca;
-% ax.Color = 'yellow';
+figure;
+pcshow(cap);
+title('Original')
+xlabel('X(m)')
+ylabel('Y(m)')
+zlabel('Z(m)')
+ax = gca;
+ax.Color = 'yellow';
 
 figure
 pcshow(ptCloudTformed);
